@@ -20,6 +20,13 @@
 # production
 /build
 
+# local UI reference app
+/devfixes/
+
+# extension build artifacts
+/extensions/*/node_modules/
+/extensions/*/out/
+
 # misc
 .DS_Store
 *.pem

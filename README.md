@@ -1,36 +1,238 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevFixes
 
-## Getting Started
+Production Next.js application for searching, understanding, and fixing
+developer errors.
 
-First, run the development server:
+## Product surfaces
 
-```bash
+- Search-first homepage and fuzzy error index
+- Dedicated VS Code extension guide with named extensions, install commands,
+  purposes, and a downloadable DevFixes companion VSIX
+- GitHub repository guide explaining what important official repositories are
+  useful for during debugging
+- Error Fingerprint detection for pasted traces and logs
+- AI debugger with local fallback and probability-ranked fixes
+- Tutorial knowledge base with Markdown, JSON, and structured authoring paths
+- Copy controls for every quick fix, ranked method, environment alternative,
+  and code example
+- Uniform error articles with causes, explanations, commands, examples, FAQs,
+  references, related errors, and structured data
+- Protected `/admin` workspace for adding and publishing errors without editing
+  source code
+- Protected `/admin/tutorials` studio for writing and publishing tutorials without
+  editing source code
+- Supabase-backed live catalog with bundled starter content as a fallback
+- Cloudflare R2 signed uploads for diagnostic files up to 5 MB
+- AdSense-ready responsive placements and root `ads.txt`
+- Sitemap, robots, canonical URLs, FAQ/HowTo/TechArticle schema, Open Graph,
+  security headers, privacy page, and health endpoint
+
+## Local development
+
+```powershell
+npm install
+Copy-Item .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The public site works without credentials. AI, database writes, uploaded logs,
+admin publishing, and ads activate only when their environment variables exist.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Admin editor
 
-## Learn More
+Set a long random `DEVFIXES_ADMIN_TOKEN`, restart the app, and open `/admin`.
+The token is exchanged for a 12-hour HttpOnly, Secure, SameSite=Strict cookie.
 
-To learn more about Next.js, take a look at the following resources:
+The editor supports:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Draft, review, and published states
+- Loading existing Supabase articles back into the editor
+- Importing a complete DevFixes article from a JSON file
+- Downloading a valid JSON template and copying complete draft JSON
+- Language, framework, severity, difficulty, tags, and popularity
+- Beginner meaning and common causes
+- Quick-fix commands and expected output
+- Any number of probability-ranked debug methods
+- Windows, macOS, Linux, Docker, Conda, or custom alternatives
+- Broken and corrected code
+- Related error slugs
+- FAQs and official references
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Publishing writes the complete article to Supabase and revalidates the homepage,
+search index, article route, and sitemap.
 
-## Deploy on Vercel
+### Add or upload an error
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Open `/admin` and sign in with `DEVFIXES_ADMIN_TOKEN`.
+2. Select `New error` to write directly in the structured editor, or select
+   `Import JSON` to load a file created from the downloadable template.
+3. Complete the identity, explanation, quick fix, ranked methods, environment
+   alternatives, examples, FAQs, and references.
+4. Save as `Draft` or `Needs review` while checking the commands.
+5. Select `Published` and save to make the page available in search and the
+   sitemap. Supabase must be configured before any server-side save can persist.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Add or upload a tutorial
+
+1. Open `/admin/tutorials` and sign in with `DEVFIXES_ADMIN_TOKEN`.
+2. Choose one authoring path:
+   - Use the structured editor for a new tutorial.
+   - Select `Import Markdown` to load the body from an `.md` file, then complete
+     the metadata and learning fields in the studio.
+   - Select `Import JSON` to load a complete tutorial object.
+3. Use the download button to get `devfixes-tutorial-template.json` when starting
+   a new JSON tutorial. The imported file is validated before it can be saved.
+4. Use `Preview` to inspect the public route. Code blocks on the public page have
+   their own copy button.
+5. Save as `Draft` while writing, `Needs review` while checking commands and
+   references, or `Published` when it is ready. Published tutorials appear under
+   `/tutorials`, in related error pages, and in the sitemap.
+
+The public tutorial format is intentionally Markdown inside a structured record.
+This keeps the writing experience flexible while preserving consistent SEO,
+structured data, related errors, FAQs, references, and publication states.
+
+When Supabase is unavailable during local development, the studio now saves
+validated records under `content/tutorials`. Published local records immediately
+appear in the tutorial index and can be committed with the project. Set
+`DEVFIXES_LOCAL_PUBLISHING=true` to explicitly enable this mode outside development.
+
+The studio also includes a rendered draft preview, word and section counts, and
+a search-readiness checklist for titles, excerpts, outcomes, references, FAQs,
+tags, and substantial tutorial content.
+
+## Supabase
+
+The CLI project is initialized in `supabase/config.toml`.
+
+```powershell
+supabase login
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+```
+
+Then add:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+The migration creates the error catalog, votes, reports, bookmarks, analytics,
+and debugging history with row-level security. The service-role key must remain
+server-only.
+
+## Cloudflare R2
+
+Authenticate Wrangler and run the checked-in setup script:
+
+```powershell
+npx --yes wrangler login
+powershell -ExecutionPolicy Bypass -File scripts/setup-r2.ps1
+```
+
+The script performs these exact operations:
+
+```powershell
+npx --yes wrangler r2 bucket create devfixes-logs
+npx --yes wrangler r2 bucket cors set devfixes-logs --file cloudflare/r2-cors.json --force
+npx --yes wrangler r2 bucket lifecycle add devfixes-logs delete-debug-logs logs/ --expire-days 7 --force
+```
+
+`cloudflare/r2-cors.json` permits direct uploads from localhost,
+`https://devfixes.vercel.app`, `https://mediatoolkit.tech`, and
+`https://www.mediatoolkit.tech`.
+
+Create an R2 API token scoped to object reads and writes for this bucket, then
+configure `CLOUDFLARE_R2_ACCOUNT_ID`, `CLOUDFLARE_R2_ACCESS_KEY_ID`,
+`CLOUDFLARE_R2_SECRET_ACCESS_KEY`, and `CLOUDFLARE_R2_BUCKET` in Vercel.
+Uploaded files are private, use 10-minute signed PUT URLs, and expire after
+seven days by default.
+
+## OpenAI
+
+Set `OPENAI_API_KEY`. The default `OPENAI_MODEL` is `gpt-5.6-terra`.
+`/api/debug` uses the Responses API with structured Zod output. Diagnostic text
+is explicitly treated as untrusted input. If AI is unavailable, the local
+fingerprint engine still returns a useful result.
+
+## Isolated labs
+
+Set `E2B_API_KEY` to execute lab submissions inside short-lived, network-restricted
+E2B sandboxes. The server only runs fixed challenge verification commands, limits
+code size and request frequency, and destroys each sandbox after the run.
+
+Without E2B, labs retain the guided verifier so the learning flow remains usable,
+but the interface labels that mode honestly instead of presenting canned output
+as a real runtime.
+
+## GitHub hosting
+
+The source repository is hosted at `https://github.com/STEVOHCODER/devfixes`.
+GitHub Pages publishes the project landing page from `github-pages/`. The full
+Next.js application must remain on Vercel or another Node-compatible host because
+GitHub Pages cannot run admin APIs, Supabase server access, uploads, or sandboxes.
+
+## Google AdSense
+
+Configure:
+
+```text
+NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-...
+ADSENSE_PUBLISHER_ID=pub-...
+NEXT_PUBLIC_ADSENSE_SLOT_HOME=
+NEXT_PUBLIC_ADSENSE_SLOT_SEARCH=
+NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE=
+```
+
+Ad placements are labeled and kept outside navigation, commands, copy controls,
+and debugger actions. `/ads.txt` is generated from the publisher ID. Before
+serving personalized ads in regulated regions, configure the required
+Google-certified consent management platform in the AdSense account.
+
+Do not submit the site for AdSense review until it has a real domain, complete
+privacy/contact information, substantial original error content, and no empty
+or placeholder pages.
+
+## Vercel deployment
+
+```powershell
+vercel
+vercel --prod
+```
+
+Add the variables from `.env.example` to Development, Preview, and Production
+as appropriate. Set `NEXT_PUBLIC_SITE_URL` to the final production origin.
+
+The included `vercel.json` grants the AI debugger a 60-second function
+duration.
+
+## Verification
+
+```powershell
+npm run lint
+npm run typecheck
+npm run build
+npm audit --omit=dev
+```
+
+Health endpoint: `/api/health`
+
+## VS Code companion
+
+The extension source lives in `extensions/devfixes-error-search`.
+
+```powershell
+Set-Location extensions/devfixes-error-search
+npm install
+npm run compile
+npm run package
+```
+
+Packaging writes `public/downloads/devfixes-error-search-0.1.0.vsix`, which is
+served by the `/resources/vscode` page. The extension opens selected diagnostic
+text in DevFixes search or the Error Fingerprint debugger and does not collect
+telemetry.
