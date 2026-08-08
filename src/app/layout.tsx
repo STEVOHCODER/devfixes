@@ -52,8 +52,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "dark",
-  themeColor: "#080b0e",
+  colorScheme: "light",
+  themeColor: "#5b5bd6",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -76,8 +76,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         ) : null}
         <div className="ambient-grid" aria-hidden="true" />
         <SiteHeader />
-        <main className="min-h-[calc(100vh-68px)]">{children}</main>
-        <SiteFooter />
+        <div className="pt-16 lg:pl-64 lg:pt-0">
+          <main className="min-h-screen">{children}</main>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

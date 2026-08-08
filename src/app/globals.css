@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #080b0e;
-  --surface: #0d1115;
-  --surface-strong: #12171d;
-  --line: #232b33;
-  --line-soft: #171e24;
-  --foreground: #f3f6f7;
-  --muted: #9ba6af;
-  --faint: #68737d;
-  --accent: #49e6a0;
-  --accent-deep: #0c9b67;
-  --accent-soft: rgba(73, 230, 160, 0.1);
+  --background: #f7f8fc;
+  --surface: #ffffff;
+  --surface-strong: #eef0f8;
+  --line: #dfe3ee;
+  --line-soft: #eceef5;
+  --foreground: #20243a;
+  --muted: #687086;
+  --faint: #9299aa;
+  --accent: #5b5bd6;
+  --accent-deep: #4444b8;
+  --accent-soft: rgba(91, 91, 214, 0.1);
 }
 
 @theme inline {
@@ -47,6 +47,10 @@ body {
   letter-spacing: 0;
 }
 
+::selection {
+  background: rgba(91, 91, 214, 0.2);
+}
+
 button,
 input,
 textarea {
@@ -72,14 +76,14 @@ textarea:focus-visible {
   z-index: -1;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.017) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.017) 1px, transparent 1px);
+    linear-gradient(rgba(91, 91, 214, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 91, 214, 0.025) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: linear-gradient(to bottom, black, transparent 75%);
 }
 
 .section-shell {
-  width: min(1160px, calc(100% - 32px));
+  width: min(1240px, calc(100% - 32px));
   margin-inline: auto;
 }
 
@@ -108,7 +112,14 @@ textarea:focus-visible {
   left: 15%;
   right: 15%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: var(--accent);
+}
+
+.app-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 8px 28px rgba(38, 42, 73, 0.06);
 }
 
 .trace-line {
