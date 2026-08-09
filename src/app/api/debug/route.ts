@@ -63,6 +63,74 @@ Rules:
   github-actions-process-completed-exit-code-1,
   vscode-code-command-not-found, node-err-module-not-found.`;
 
+function geminiModelSchema() {
+  return {
+    type: "OBJECT",
+    properties: {
+      language: { type: "STRING" },
+      framework: { type: "STRING" },
+      errorType: { type: "STRING" },
+      summary: { type: "STRING" },
+      explanation: { type: "STRING" },
+      rootCause: { type: "STRING" },
+      confidence: { type: "NUMBER" },
+      suspiciousLines: {
+        type: "ARRAY",
+        items: {
+          type: "OBJECT",
+          properties: { line: { type: "INTEGER" }, reason: { type: "STRING" } },
+          required: ["line", "reason"],
+        },
+      },
+      fixes: {
+        type: "ARRAY",
+        items: {
+          type: "OBJECT",
+          properties: {
+            title: { type: "STRING" },
+            probability: { type: "NUMBER" },
+            explanation: { type: "STRING" },
+            commands: { type: "ARRAY", items: { type: "STRING" } },
+            correctedCode: { type: "STRING" },
+          },
+          required: ["title", "probability", "explanation", "commands"],
+        },
+      },
+      beginnerMistakes: { type: "ARRAY", items: { type: "STRING" } },
+      prevention: { type: "ARRAY", items: { type: "STRING" } },
+      relatedSlugs: { type: "ARRAY", items: { type: "STRING" } },
+    },
+    required: [
+      "language", "errorType", "summary", "explanation", "rootCause",
+      "confidence", "suspiciousLines", "fixes", "beginnerMistakes",
+      "prevention", "relatedSlugs",
+    ],
+  };
+}
+
+async function runGemini(input: string, apiKey: string) {
+  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: `Analyze this diagnostic input:\n\n${input}` }] }],
+        generationConfig: { responseMimeType: "application/json", responseSchema: geminiModelSchema() },
+      }),
+    },
+  );
+
+  if (!response.ok) throw new Error(`Gemini request failed with ${response.status}`);
+  const payload = (await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("");
+  const parsed = analysisSchema.safeParse(text ? JSON.parse(text) : null);
+  if (!parsed.success) throw new Error("Gemini returned an invalid analysis shape");
+  return parsed.data;
+}
+
 export async function POST(request: Request) {
   const parsed = requestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -74,7 +142,24 @@ export async function POST(request: Request) {
 
   const input = parsed.data.input;
   const fallback = createLocalAnalysis(input);
+  const geminiKey = process.env.GEMINI_API_KEY;
   const apiKey = process.env.OPENAI_API_KEY;
+
+  if (geminiKey) {
+    try {
+      const result = { ...(await runGemini(input, geminiKey)), source: "ai" as const, provider: "gemini" as const };
+      await trackEvent("debug_ai", {
+        language: result.language,
+        errorType: result.errorType,
+        confidence: result.confidence,
+        model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+        provider: "gemini",
+      });
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error("Gemini debugging failed", error);
+    }
+  }
 
   if (!apiKey) {
     await trackEvent("debug_local", {
@@ -100,7 +185,7 @@ export async function POST(request: Request) {
       return NextResponse.json(fallback);
     }
 
-    const result = { ...response.output_parsed, source: "ai" as const };
+    const result = { ...response.output_parsed, source: "ai" as const, provider: "openai" as const };
     await trackEvent("debug_ai", {
       language: result.language,
       errorType: result.errorType,

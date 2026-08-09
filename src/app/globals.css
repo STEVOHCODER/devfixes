@@ -122,6 +122,34 @@ textarea:focus-visible {
   box-shadow: 0 8px 28px rgba(38, 42, 73, 0.06);
 }
 
+.field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field-input {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--background);
+  padding: 10px 12px;
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 1.5;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 .trace-line {
   display: block;
   margin-inline: -8px;

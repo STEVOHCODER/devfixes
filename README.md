@@ -12,6 +12,10 @@ developer errors.
   useful for during debugging
 - Error Fingerprint detection for pasted traces and logs
 - AI debugger with local fallback and probability-ranked fixes
+- Universal learning IDE with guided debugging challenges, runnable code editor,
+  terminal simulation, collapsible rails, and full-screen focus mode
+- Browser-local challenge authoring with JSON/Markdown/text imports and
+  exportable error, explanation, broken-code, and corrected-code examples
 - Tutorial knowledge base with Markdown, JSON, and structured authoring paths
 - Copy controls for every quick fix, ranked method, environment alternative,
   and code example
@@ -159,6 +163,12 @@ Set `OPENAI_API_KEY`. The default `OPENAI_MODEL` is `gpt-5.6-terra`.
 is explicitly treated as untrusted input. If AI is unavailable, the local
 fingerprint engine still returns a useful result.
 
+To use Gemini as the in-editor debugging partner, set `GEMINI_API_KEY` and
+optionally `GEMINI_MODEL` (default: `gemini-2.5-flash`). The `/api/debug` route
+prefers Gemini when configured, falls back to OpenAI when only its key exists,
+and always retains the local fingerprint fallback. Keys remain server-side;
+the browser sends only the error and current code context.
+
 ## Isolated labs
 
 Set `E2B_API_KEY` to execute lab submissions inside short-lived, network-restricted
@@ -168,6 +178,19 @@ code size and request frequency, and destroys each sandbox after the run.
 Without E2B, labs retain the guided verifier so the learning flow remains usable,
 but the interface labels that mode honestly instead of presenting canned output
 as a real runtime.
+
+## Universal learning IDE
+
+Open `/playground` to work through the built-in debugging challenges. The editor
+and terminal share a focused workspace; the challenge library and teaching guide
+rails can be collapsed when more code space is needed. Each challenge includes
+the error anatomy, evidence to inspect, a step-by-step debugging path, hints,
+and a broken-versus-corrected example.
+
+Users can select `Import` to load a JSON challenge or a plain-text/Markdown error
+capture, or select `Add your own failure` to author a challenge in the browser.
+Custom cases are stored locally until they are exported as JSON. This keeps
+private logs on the user's device while still making them reusable as lessons.
 
 ## GitHub hosting
 

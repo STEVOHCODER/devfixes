@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { UniversalLab } from "@/components/universal-lab";
 
 export const metadata: Metadata = {
-  title: "Universal debugging playground",
-  description: "Switch between Python, Node.js, JavaScript, Git, PowerShell, CMD, VS Code, and Bash error simulations.",
+  title: "Debugging learning IDE",
+  description: "Write code, reproduce failures, inspect diagnostics, learn from guided examples, and pair with Gemini across popular developer tools.",
 };
 
 export default function PlaygroundPage() {
