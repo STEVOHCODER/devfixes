@@ -6,6 +6,7 @@ import {
   Bug,
   Home,
   Menu,
+  MessageSquareText,
   Search,
   Settings,
   Sparkles,
@@ -20,6 +21,7 @@ import { Brand } from "@/components/brand";
 
 const links = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/questions", label: "Questions", icon: MessageSquareText },
   { href: "/labs", label: "Scenarios", icon: Bug },
   { href: "/playground", label: "Playground", icon: SquareTerminal },
   { href: "/tutorials", label: "Tutorials", icon: BookOpen },

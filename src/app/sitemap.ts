@@ -40,6 +40,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/questions`,
+      lastModified: verified,
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
+    {
       url: `${baseUrl}/debug`,
       lastModified: verified,
       changeFrequency: "monthly",
@@ -53,6 +59,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/labs`,
+      lastModified: verified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/playground`,
       lastModified: verified,
       changeFrequency: "weekly",
       priority: 0.9,

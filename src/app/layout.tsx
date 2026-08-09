@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | DevFixes",
   },
   description:
-    "Search programming errors, identify root causes, and get probability-ranked fixes with AI-assisted debugging.",
+    "Search exact programming errors and stack traces, compare verified answers, ask debugging questions, and practice fixes in an interactive coding lab.",
   applicationName: "DevFixes",
   keywords: [
     "programming errors",
@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     "error messages",
     "stack trace",
     "developer tools",
+    "programming questions",
+    "coding answers",
+    "interactive debugging lab",
   ],
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
@@ -37,13 +40,13 @@ export const metadata: Metadata = {
     siteName: "DevFixes",
     title: "Fix programming errors faster",
     description:
-      "Paste an error or stack trace. Find the root cause and the most likely fix.",
+      "Search an error or stack trace, understand the root cause, and test the verified fix.",
     url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
     title: "DevFixes",
-    description: "Errors in. Answers out.",
+    description: "Programming errors in. Verified answers and practice out.",
   },
   robots: {
     index: true,

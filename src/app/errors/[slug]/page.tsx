@@ -8,6 +8,7 @@ import {
   Clock3,
   ExternalLink,
   Gauge,
+  MessageSquareText,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -116,8 +117,8 @@ export default async function ErrorPage({ params }: { params: Promise<{ slug: st
       />
       <div className="section-shell grid gap-10 py-10 lg:grid-cols-[150px_minmax(0,760px)_170px] lg:justify-between">
         <aside className="hidden self-start lg:sticky lg:top-24 lg:block">
-          <Link href="/search" className="flex items-center gap-2 text-[10px] font-bold text-faint hover:text-foreground">
-            <ArrowLeft size={13} /> All errors
+          <Link href="/questions" className="flex items-center gap-2 text-[10px] font-bold text-faint hover:text-foreground">
+            <ArrowLeft size={13} /> All questions
           </Link>
           <nav className="mt-8 grid gap-1 border-l border-line pl-3 text-[9px] text-faint">
             {[
@@ -141,6 +142,7 @@ export default async function ErrorPage({ params }: { params: Promise<{ slug: st
           <div className="border-b border-line pb-10">
             <div className="flex items-center gap-1.5 font-mono text-[9px] text-faint">
               <Link href="/">Home</Link><ChevronRight size={10} />
+              <Link href="/questions">Questions</Link><ChevronRight size={10} />
               <Link href={`/search?q=${article.language}`}>{article.language}</Link><ChevronRight size={10} />
               <span>{article.category}</span>
             </div>
@@ -161,6 +163,9 @@ export default async function ErrorPage({ params }: { params: Promise<{ slug: st
               <CopyButton value={pageUrl} label="Copy link" />
               <Link href={`/debug?article=${article.slug}`} className="inline-flex h-8 items-center gap-1.5 rounded bg-accent px-3 text-[9px] font-extrabold text-[#04110b]">
                 <Sparkles size={12} /> Debug with AI
+              </Link>
+              <Link href="/playground" className="inline-flex h-8 items-center gap-1.5 rounded border border-line px-3 text-[9px] font-bold text-muted">
+                <MessageSquareText size={12} /> Practice this answer
               </Link>
             </div>
           </div>
@@ -187,7 +192,8 @@ export default async function ErrorPage({ params }: { params: Promise<{ slug: st
             </section>
 
             <section id="quick-fix" className="scroll-mt-24 border-b border-line-soft py-12">
-              <h2 className="text-2xl font-semibold">Quick fix</h2>
+              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-emerald-700"><CheckCircle2 size={15} /> Accepted fix</span>
+              <h2 className="mt-2 text-2xl font-semibold">Most likely solution</h2>
               <CodeBlock code={article.quickFix.commands.join("\n")} />
               <div className="mt-3 rounded-md border border-accent/20 bg-accent/5 p-4 text-[10px] text-muted">
                 <strong className="text-foreground">Expected output: </strong>{article.quickFix.expected}
@@ -201,7 +207,7 @@ export default async function ErrorPage({ params }: { params: Promise<{ slug: st
             />
 
             <section id="steps" className="scroll-mt-24 border-b border-line-soft py-12">
-              <h2 className="text-2xl font-semibold">Step-by-step fix</h2>
+              <h2 className="text-2xl font-semibold">Verified answers</h2>
               <div className="mt-5 grid gap-2">
                 {article.solutions.map((solution, index) => (
                   <div key={solution.title} className="overflow-hidden rounded-md border border-line bg-surface">

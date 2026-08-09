@@ -1,116 +1,31 @@
-import {
-  ArrowRight,
-  BookOpen,
-  Bug,
-  CheckCircle2,
-  Clock3,
-  Flame,
-  Play,
-  Sparkles,
-  Target,
-  Trophy,
-} from "lucide-react";
+import type { Metadata } from "next";
+import { ArrowRight, BookOpen, CheckCircle2, Eye, MessageSquareText, Search, ShieldCheck, Sparkles, SquareTerminal, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { getPublishedErrors } from "@/lib/error-repository";
-import { labs } from "@/lib/labs-data";
 import { getPublishedTutorials } from "@/lib/tutorial-repository";
 
 export const revalidate = 300;
 
-const skillRows = [
-  ["Dependencies", 72, "bg-indigo-500"],
-  ["Git & version control", 58, "bg-violet-500"],
-  ["Runtime errors", 44, "bg-sky-500"],
-  ["Environment setup", 31, "bg-amber-500"],
-] as const;
+export const metadata: Metadata = {
+  title: "Fix programming errors with verified answers and debugging labs",
+  description: "Search exact programming errors and stack traces, compare verified solutions, ask debugging questions, and practice fixes in an interactive coding lab.",
+  keywords: ["fix programming errors", "debugging help", "coding questions", "stack trace solutions", "programming error answers", "interactive debugging lab"],
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
-  const [articles, tutorials] = await Promise.all([
-    getPublishedErrors(),
-    getPublishedTutorials(),
-  ]);
-  const trending = [...articles].sort((left, right) => right.trend - left.trend).slice(0, 4);
+  const [articles, tutorials] = await Promise.all([getPublishedErrors(), getPublishedTutorials()]);
+  const trending = [...articles].sort((a, b) => b.trend - a.trend).slice(0, 6);
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devfixes.dev";
+  const schema = { "@context": "https://schema.org", "@graph": [{ "@type": "WebSite", name: "DevFixes", url: baseUrl, description: metadata.description, potentialAction: { "@type": "SearchAction", target: `${baseUrl}/search?q={search_term_string}`, "query-input": "required name=search_term_string" } }, { "@type": "Organization", name: "DevFixes", url: baseUrl, description: "Evidence-based programming error guides and interactive debugging education." }] };
 
-  return (
-    <div className="section-shell py-8 sm:py-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <span className="text-sm font-semibold text-accent">Learning dashboard</span>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Ready to fix something?</h1>
-          <p className="mt-2 text-sm text-muted">Practice the debugging loop until errors feel like useful signals.</p>
-        </div>
-        <Link href="/search" className="inline-flex h-11 items-center gap-2 self-start rounded-xl border border-line bg-white px-4 text-sm font-semibold text-muted shadow-sm hover:text-accent">
-          <Bug size={17} /> Search {articles.length} error guides
-        </Link>
-      </div>
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} /><div>
+    <section className="border-b border-line bg-white"><div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.2fr_.8fr] lg:items-center"><div><span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-3 py-1.5 text-xs font-bold text-accent"><ShieldCheck size={14} /> Verified developer knowledge</span><h1 className="mt-5 max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">Fix programming errors with answers you can understand and test.</h1><p className="mt-5 max-w-2xl text-base leading-7 text-muted">Search exact error messages, compare evidence-backed fixes, ask focused questions, and practice the solution in a compact coding lab.</p><form action="/search" className="mt-7 flex max-w-2xl items-center gap-2 rounded-2xl border border-line bg-background p-2 shadow-sm"><Search size={18} className="ml-3 shrink-0 text-faint" /><input name="q" className="min-w-0 flex-1 bg-transparent px-1 py-3 text-sm outline-none" placeholder="Paste an error, exception, or stack-trace line" aria-label="Search programming errors" /><button className="h-11 rounded-xl bg-accent px-5 text-sm font-bold text-white" type="submit">Find fixes</button></form><div className="mt-5 flex flex-wrap gap-3"><Link href="/questions" className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-bold text-foreground"><MessageSquareText size={16} /> Browse questions</Link><Link href="/playground" className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-bold text-foreground"><SquareTerminal size={16} /> Open debugging lab</Link></div></div><div className="rounded-3xl bg-[#111522] p-6 text-white shadow-[0_24px_70px_rgba(21,25,38,.22)]"><div className="flex items-center gap-2 border-b border-white/10 pb-4 font-mono text-xs text-[#8e9aac]"><span className="size-2.5 rounded-full bg-red-400" /><span className="size-2.5 rounded-full bg-amber-400" /><span className="size-2.5 rounded-full bg-emerald-400" /><span className="ml-2">debug session</span></div><pre className="mt-5 whitespace-pre-wrap font-mono text-xs leading-7 text-[#c8d0dc]">$ python app.py{"\n"}<span className="text-red-300">ModuleNotFoundError: No module named &apos;requests&apos;</span>{"\n\n"}$ python -c &quot;import sys; print(sys.executable)&quot;{"\n"}<span className="text-amber-200">C:\project\.venv\Scripts\python.exe</span>{"\n\n"}$ python -m pip install requests{"\n"}<span className="text-emerald-300">✓ Import verified · root cause explained</span></pre><div className="mt-5 grid grid-cols-3 gap-2 text-center">{[[articles.length, "error guides"], [articles.reduce((sum, item) => sum + item.solutions.length, 0), "verified fixes"], ["17", "lab cases"]].map(([value, label]) => <div key={String(label)} className="rounded-xl bg-white/5 p-3"><b className="block text-lg">{value}</b><span className="text-[10px] text-[#8e9aac]">{label}</span></div>)}</div></div></div></section>
 
-      <section className="mt-8 overflow-hidden rounded-3xl bg-[#6254d9] p-7 text-white shadow-[0_20px_50px_rgba(91,91,214,.22)] sm:p-10">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold"><Flame size={14} /> Daily debugging challenge</span>
-            <h2 className="mt-5 max-w-2xl text-3xl font-bold leading-tight sm:text-5xl">You learn debugging by fixing the broken thing.</h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-indigo-100">Open a realistic failure, inspect the evidence, try commands, spend hints carefully, and verify the fix.</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/labs/python" className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-accent"><Play size={17} /> Start Python scenario</Link>
-              <Link href="/labs" className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/30 px-5 text-sm font-bold text-white">Browse all scenarios <ArrowRight size={16} /></Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              ["11", "practice tracks", Target],
-              ["114", "scenario goals", Bug],
-              ["4 day", "current streak", Flame],
-              ["860", "best score", Trophy],
-            ].map(([value, label, Icon]) => {
-              const StatIcon = Icon as typeof Trophy;
-              return <div key={String(label)} className="rounded-2xl border border-white/20 bg-white/10 p-4"><StatIcon size={18} className="text-indigo-100" /><strong className="mt-5 block text-2xl">{String(value)}</strong><span className="text-xs text-indigo-100">{String(label)}</span></div>;
-            })}
-          </div>
-        </div>
-      </section>
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14"><div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><span className="text-xs font-bold uppercase tracking-[.16em] text-accent">Questions developers are solving</span><h2 className="mt-2 text-2xl font-bold sm:text-3xl">Searchable problems. Accepted fixes.</h2></div><Link href="/questions" className="text-sm font-bold text-accent">View all programming questions →</Link></div><div className="mt-6 overflow-hidden rounded-2xl border border-line bg-white shadow-sm"><div className="divide-y divide-line-soft">{trending.map((article) => <article key={article.slug} className="grid gap-3 p-4 sm:grid-cols-[95px_minmax(0,1fr)] sm:p-5"><div className="flex gap-4 text-[10px] text-muted sm:grid sm:gap-1.5 sm:text-right"><span className="flex items-center gap-1 sm:justify-end"><ThumbsUp size={12} /> {Math.max(1, Math.round(article.popularity / 8))} votes</span><span className="flex items-center gap-1 font-bold text-emerald-700 sm:justify-end"><MessageSquareText size={12} /> {article.solutions.length} answers</span><span className="flex items-center gap-1 sm:justify-end"><Eye size={12} /> {article.views.toLocaleString()}</span></div><div><Link href={`/errors/${article.slug}`} className="text-base font-bold text-accent-deep hover:text-accent">{article.title}</Link><p className="mt-1 line-clamp-2 text-xs leading-5 text-muted">{article.excerpt}</p><div className="mt-3 flex flex-wrap gap-2">{article.tags.slice(0, 4).map((tag) => <Link key={tag} href={`/questions?tag=${encodeURIComponent(tag)}`} className="rounded-md bg-accent/8 px-2 py-1 text-[10px] font-bold text-accent">{tag}</Link>)}<span className="ml-auto flex items-center gap-1 text-[10px] font-bold text-emerald-700"><CheckCircle2 size={12} /> verified</span></div></div></article>)}</div></div></section>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1.45fr_.75fr]">
-        <section className="app-card p-5 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div><span className="text-xs font-bold uppercase tracking-wide text-accent">Continue learning</span><h2 className="mt-1 text-xl font-bold">Recommended scenarios</h2></div>
-            <Link href="/labs" className="text-sm font-bold text-accent">View all</Link>
-          </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            {labs.slice(0, 3).map((lab, index) => (
-              <Link key={lab.slug} href={`/labs/${lab.slug}`} className="group rounded-2xl border border-line bg-background p-4 transition hover:-translate-y-0.5 hover:border-accent/40 hover:bg-white">
-                <div className="flex items-center justify-between"><span className="grid size-10 place-items-center rounded-xl bg-accent/10 text-accent"><Bug size={18} /></span><span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-muted">{lab.difficulty}</span></div>
-                <strong className="mt-4 block">{lab.name}</strong>
-                <p className="mt-2 min-h-12 text-xs leading-5 text-muted">{lab.description}</p>
-                <div className="mt-4 flex items-center justify-between text-xs text-faint"><span className="flex items-center gap-1"><Clock3 size={13} /> {lab.estimatedTime}</span><span>{index + 1}/12 complete</span></div>
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line"><div className="h-full rounded-full bg-accent" style={{ width: `${18 + index * 15}%` }} /></div>
-              </Link>
-            ))}
-          </div>
-        </section>
+    <section className="border-y border-line bg-white"><div className="mx-auto grid max-w-6xl gap-4 px-4 py-10 sm:px-6 md:grid-cols-3">{[{ icon: MessageSquareText, title: "Ask and answer", text: "Write minimal reproducible questions, add tags, vote on useful fixes, and recognize accepted solutions.", href: "/questions" }, { icon: Sparkles, title: "AI-assisted diagnosis", text: "Use Gemini to explain the root cause and suggest evidence to collect—without exposing the server-side key.", href: "/debug" }, { icon: SquareTerminal, title: "Practice the fix", text: "Move from reading to doing in a compact lab with code, terminal output, hints, and verification.", href: "/playground" }].map(({ icon: Icon, title, text, href }) => <Link key={title} href={href} className="group rounded-2xl border border-line bg-background p-6 hover:border-accent/40 hover:bg-white"><span className="grid size-11 place-items-center rounded-xl bg-accent/10 text-accent"><Icon size={20} /></span><h2 className="mt-5 text-lg font-bold">{title}</h2><p className="mt-2 text-sm leading-6 text-muted">{text}</p><span className="mt-5 flex items-center gap-1 text-xs font-bold text-accent">Explore <ArrowRight size={13} /></span></Link>)}</div></section>
 
-        <section className="app-card p-5 sm:p-6">
-          <div className="flex items-center justify-between"><h2 className="text-xl font-bold">Skill progress</h2><Link href="/dashboard" className="text-xs font-bold text-accent">Details</Link></div>
-          <div className="mt-6 grid gap-5">
-            {skillRows.map(([label, value, tone]) => <div key={label}><div className="flex items-center justify-between text-sm"><span className="font-semibold">{label}</span><span className="font-bold text-muted">{value}%</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-line-soft"><div className={`h-full rounded-full ${tone}`} style={{ width: `${value}%` }} /></div></div>)}
-          </div>
-        </section>
-      </div>
-
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="app-card p-5 sm:p-6">
-          <div className="flex items-center justify-between"><div><span className="text-xs font-bold uppercase tracking-wide text-accent">Learn the concept</span><h2 className="mt-1 text-xl font-bold">Latest tutorials</h2></div><BookOpen size={20} className="text-accent" /></div>
-          <div className="mt-4 divide-y divide-line-soft">
-            {tutorials.slice(0, 3).map((tutorial) => <Link key={tutorial.slug} href={`/tutorials/${tutorial.slug}`} className="group flex items-center gap-4 py-4"><span className="grid size-12 shrink-0 place-items-center rounded-xl bg-[#eeeafe] text-accent"><BookOpen size={20} /></span><span className="min-w-0 flex-1"><strong className="block truncate text-sm">{tutorial.title}</strong><small className="mt-1 flex items-center gap-2 text-faint"><span>{tutorial.technology}</span><span>•</span><span>{tutorial.estimatedTime}</span></small></span><ArrowRight size={16} className="text-faint group-hover:text-accent" /></Link>)}
-          </div>
-        </section>
-
-        <section className="app-card p-5 sm:p-6">
-          <div className="flex items-center justify-between"><div><span className="text-xs font-bold uppercase tracking-wide text-accent">Popular now</span><h2 className="mt-1 text-xl font-bold">Errors developers are fixing</h2></div><Sparkles size={20} className="text-accent" /></div>
-          <div className="mt-4 divide-y divide-line-soft">
-            {trending.map((error) => <Link key={error.slug} href={`/errors/${error.slug}`} className="group flex items-center gap-3 py-4"><CheckCircle2 size={17} className="shrink-0 text-emerald-500" /><span className="min-w-0 flex-1"><strong className="block truncate text-sm">{error.title}</strong><small className="text-faint">{error.language} · {error.category}</small></span><ArrowRight size={16} className="text-faint group-hover:text-accent" /></Link>)}
-          </div>
-        </section>
-      </div>
-    </div>
-  );
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14"><div className="flex items-center justify-between"><div><span className="text-xs font-bold uppercase tracking-[.16em] text-accent">Learn the fundamentals</span><h2 className="mt-2 text-2xl font-bold">Debugging tutorials</h2></div><Link href="/tutorials" className="text-sm font-bold text-accent">All tutorials</Link></div><div className="mt-6 grid gap-4 md:grid-cols-2">{tutorials.slice(0, 4).map((tutorial) => <Link key={tutorial.slug} href={`/tutorials/${tutorial.slug}`} className="rounded-2xl border border-line bg-white p-5 shadow-sm hover:border-accent/40"><span className="flex items-center gap-2 text-xs font-bold text-accent"><BookOpen size={15} /> {tutorial.technology}</span><h3 className="mt-3 text-lg font-bold">{tutorial.title}</h3><p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">{tutorial.excerpt}</p><div className="mt-4 flex gap-2 text-[10px] text-faint"><span>{tutorial.difficulty}</span><span>•</span><span>{tutorial.estimatedTime}</span></div></Link>)}</div></section>
+  </div></>;
 }
