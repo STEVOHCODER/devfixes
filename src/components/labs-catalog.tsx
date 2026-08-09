@@ -95,10 +95,10 @@ export function LabsCatalog({
               </p>
               <div className="mt-8 flex flex-wrap gap-2">
                 <Link
-                  href="/labs/python"
+                  href="/playground"
                   className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-4 text-[10px] font-extrabold text-[#04110b]"
                 >
-                  Start Python lab <ArrowRight size={14} />
+                  Open universal playground <ArrowRight size={14} />
                 </Link>
                 <Link
                   href="/debug"

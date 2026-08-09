@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { LabWorkspace } from "@/components/lab-workspace";
+import { UniversalLab } from "@/components/universal-lab";
 import { getLab, labs } from "@/lib/labs-data";
 
 export function generateStaticParams() {
@@ -32,10 +32,5 @@ export default async function LabPage({
   const lab = getLab(slug);
   if (!lab) notFound();
 
-  return (
-    <LabWorkspace
-      lab={lab}
-      isolatedRunnerConfigured={Boolean(process.env.E2B_API_KEY)}
-    />
-  );
+  return <UniversalLab initialEnvironment={lab.slug} />;
 }

@@ -9,6 +9,7 @@ import {
   Search,
   Settings,
   Sparkles,
+  SquareTerminal,
   Trophy,
   X,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { Brand } from "@/components/brand";
 const links = [
   { href: "/", label: "Home", icon: Home },
   { href: "/labs", label: "Scenarios", icon: Bug },
+  { href: "/playground", label: "Playground", icon: SquareTerminal },
   { href: "/tutorials", label: "Tutorials", icon: BookOpen },
   { href: "/dashboard", label: "Progress", icon: BarChart3 },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
